@@ -5,11 +5,44 @@ class DataSource {
 		this.url = url;
 	}
 
+	setDelegate(delegate) {
+		// TODO: verify that delegate implements the required method.
+		this.delegate = delegate;
+	}
+
+	setResponse(response) {
+		this.response = response;
+	}
+
 	setURL(url) {
 		this.url = url;
 	}
 
-	getData(callback) {
+	static count = 0;
+	thenResponse(response) {
+		if (response.ok) {
+			this.setResponse(response);
+			console.log('this.response:', this.response);
+
+			if (typeof this.delegate === 'object') {
+				// TODO: verify that delegate implements the required method.
+				console.log('Call Delegate Callback...');
+				this.delegate.dataSourceDelegateCallback();
+			}
+
+			return;
+		}
+
+		throw new Error('Something went wrong with the response.');
+	}
+
+	// getDataCallback(response) {
+	// 	console.log(response);
+	// }
+
+	getData() {
+		console.log('Executing %s.getData()...', this.constructor.name);
+
 		// if (this.response != null) {
 		// 	return this.response;
 		// }
@@ -19,24 +52,9 @@ class DataSource {
 		// 	return null;
 		// }
 
-		console.log('getData()');
-
-		window.fetch(this.url)
+		fetch(this.url)
 		.then(
-			function(response) {
-				if (response.ok) {
-					this.response = response;
-
-					if (typeof callback === 'function') {
-						console.log('Call Callback');
-						callback(response);
-					}
-
-					return this.response;
-				}
-
-				throw new Error('Something went wrong with the response.');
-			}
+			this.thenResponse.bind(this)
 		)
 		.catch(
 			function(error) {
