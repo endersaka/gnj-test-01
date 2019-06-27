@@ -7,16 +7,16 @@ import './App.css';
  * responsible to render the dog breeds list.
  */
 
-import DataSource from './DataSource.js';
+// import DataSource from './DataSource.js';
 
 // Global variable where dog breeds are stored.
-window.breeds = null;
+// window.breeds = null;
 
 // Call back used to consume dog breeds when they are loaded.
-function getBreedsCallback(breeds) {
-	console.log(breeds);
-	window.breeds = breeds;
-}
+// function getBreedsCallback(breeds) {
+// 	console.log(breeds);
+// 	window.breeds = breeds;
+// }
 /*----------------------------------------------------------------------------*/
 
 class App extends Component {
@@ -24,11 +24,11 @@ class App extends Component {
 		super(props);
 
 		// Test the above code. Create a DataSource.
-		let ds = new DataSource();
+		// let ds = new DataSource();
 
 		// Get all the breeds asyncronously and store them into window.breeds
 		// when done.
-		ds.getBreeds(getBreedsCallback);
+		// ds.getBreeds(getBreedsCallback);
 	}
 
 	render() {

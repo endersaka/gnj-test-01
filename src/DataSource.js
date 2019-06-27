@@ -1,25 +1,41 @@
 
 class DataSource {
-	constructor() {
-		console.log('I am DataSource');
+	constructor(url = null) {
+		this.response = null;
+		this.url = url;
 	}
 
-	getBreeds(callback) {
-		window.fetch('https://dog.ceo/api/breeds/list/all')
+	setURL(url) {
+		this.url = url;
+	}
+
+	getData(callback) {
+		// if (this.response != null) {
+		// 	return this.response;
+		// }
+
+		// window.fetch('https://dog.ceo/api/breeds/list/all')
+		// if (this.url == null) {
+		// 	return null;
+		// }
+
+		console.log('getData()');
+
+		window.fetch(this.url)
 		.then(
 			function(response) {
 				if (response.ok) {
-					return response.json();
+					this.response = response;
+
+					if (typeof callback === 'function') {
+						console.log('Call Callback');
+						callback(response);
+					}
+
+					return this.response;
 				}
 
 				throw new Error('Something went wrong with the response.');
-			}
-		)
-		.then(
-			function(json) {
-				console.log(json.message);
-				callback(json.message);
-				return json.message;
 			}
 		)
 		.catch(
