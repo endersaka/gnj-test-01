@@ -1,6 +1,9 @@
 
 class DataSource {
 	constructor(url = null) {
+		// Prebind methods that uses this. I just don't overuse it.
+		this.thenResponse = this.thenResponse.bind(this);
+
 		this.response = null;
 		this.url = url;
 	}
@@ -54,7 +57,7 @@ class DataSource {
 
 		fetch(this.url)
 		.then(
-			this.thenResponse.bind(this)
+			this.thenResponse
 		)
 		.catch(
 			function(error) {

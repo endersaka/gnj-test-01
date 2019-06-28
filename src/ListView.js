@@ -19,16 +19,20 @@ class ListView extends Component {
 	constructor(props) {
 		super(props);
 
-		console.log(undefinedStr);
+		// Prebind methods that uses this. I just don't overuse it.
+		this.responseJSONCallback = this.responseJSONCallback.bind(this);
 
 		this.state = {
-			json: 'undefined',
-			items: []
+			json: 'undefined'
 		};
 
-		// Test the above code. Create a DataSource.
+		// Create a DataSource.
 		this.ds = new DataSource('https://dog.ceo/api/breeds/list/all');
+
+		// Set this Component as its delegate.
 		this.ds.setDelegate(this);
+
+		// Log the DataSource.
 		console.log('DataSource:', this.ds);
 
 		// Get all the breeds asyncronously and store them into window.breeds
@@ -49,6 +53,8 @@ class ListView extends Component {
 				// Prepare an Array to store the name of each breed.
 				if (json.message !== null)
 				{
+					let id = 0;
+
 					// We will collect all the breeds in this array.
 					let breeds = [];
 
@@ -73,24 +79,29 @@ class ListView extends Component {
 									// greater then 0.
 									if (json.message[key].length > 0)
 									{
-										let baseBreedName = key;
-										let breedNames = json.message[key].map((subBreedName, index) => subBreedName + ' ' + baseBreedName);
-
-										breeds = breeds.concat(breedNames);
+										breeds = breeds.concat(json.message[key].map(
+											(name, index) => {
+												return { name: name + ' ' + key, uid: id + index };
+											}, id
+										));
+										id = breeds[breeds.length - 1].uid + 1
 									} else {
 										console.warn('\'%s\' breed has no children! Using its base name, obtaiend by key.', capitalize(key));
 
-										breeds[breeds.length] = key;
+										breeds[breeds.length] = { name: key, uid: id };
+										id++;
 									}
 								} else {
 									console.warn('The breed %s is not an Array but %s!', key, json.message[key].constructor.name);
 
-									breeds[breeds.length] = key;
+									breeds[breeds.length] = { name: key, uid: id };
+									id++;
 								}
 							} else {
 								console.warn('The breed %s is not of type \'object\'!', key);
 
-								breeds[breeds.length] = key;
+								breeds[breeds.length] = { name: key, uid: id };
+								id++;
 							}
 						}
 					}
@@ -118,7 +129,7 @@ class ListView extends Component {
 		// Read https://developer.mozilla.org/en-US/docs/Web/API/Body/json and
 		// https://developer.mozilla.org/en-US/docs/Web/API/Response#Methods
 		this.ds.response.json().then(
-			this.responseJSONCallback.bind(this)
+			this.responseJSONCallback
 		);
 	}
 
@@ -128,7 +139,7 @@ class ListView extends Component {
 		if (exists(this.state.breeds)) {
 			breedItems = this.state.breeds.map(
 				(breed, index) => { return (
-					<ListItem label={breed} />
+					<ListItem label={breed.name} key={breed.uid} value={breed.uid} />
 				); }, this
 			);
 		} else {
