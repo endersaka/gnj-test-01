@@ -1,69 +1,96 @@
+/**
+ *
+ * @type {[type]}
+ */
 
+import { isString, isObject, isValidURL, implementsFunctionWithName } from './utilities';
+
+/**
+ * DataSource class is responsible to send HTTP/REST requests to a HTTP server
+ * using Fetch API. It acts as a data interface for any React component or
+ * vanilla JavaScript code that needs to access HTTP resources.
+ */
 class DataSource {
 	constructor(url = null) {
 		// Prebind methods that uses this. I just don't overuse it.
-		this.thenResponse = this.thenResponse.bind(this);
+		this.responseHasBeenReceived = this.responseHasBeenReceived.bind(this);
+
+		// Its a good practice to use setter to initialize a member property
+		// since it also performs URL validation.
+		this.setURL(url);
 
 		this.response = null;
-		this.url = url;
+		this.delegate = null;
 	}
 
+	/**
+	 * Sets the delegate object. Delegate should implement a function named
+	 * dataSourceDelegateCallback() that takes one parameter: this parameter has
+	 * to be an instance of Response class.
+	 *
+	 * @param {object} delegate The object that acts as delegate.
+	 */
 	setDelegate(delegate) {
-		// TODO: verify that delegate implements the required method.
-		this.delegate = delegate;
+		if (implementsFunctionWithName(delegate, 'dataSourceDelegateCallback')) {
+			this.delegate = delegate;
+		}
 	}
 
-	setResponse(response) {
-		this.response = response;
-	}
-
+	/**
+	 * [setURL description]
+	 *
+	 * @param {[type]} url [description]
+	 */
 	setURL(url) {
+		// TODO: implement validation.
 		this.url = url;
 	}
 
-	static count = 0;
-	thenResponse(response) {
+	responseHasBeenReceived(response) {
+		console.log('Response has been received succefully. Procede...');
+
 		if (response.ok) {
-			this.setResponse(response);
+			console.log('Response appears to be ok. Procede...');
+
+			// Store response as a member property of this object.
+			if (this.response !== response) {
+				this.response = response;
+			}
 			console.log('this.response:', this.response);
 
-			if (typeof this.delegate === 'object') {
-				// TODO: verify that delegate implements the required method.
-				console.log('Call Delegate Callback...');
-				this.delegate.dataSourceDelegateCallback();
+
+			if (implementsFunctionWithName(this.delegate, 'dataSourceDelegateCallback')) {
+				console.log('Call delegate callback...');
+				this.delegate.dataSourceDelegateCallback(this.response);
 			}
-
-			return;
+		} else {
+			throw new Error('Something went wrong with the response.');
 		}
-
-		throw new Error('Something went wrong with the response.');
 	}
-
-	// getDataCallback(response) {
-	// 	console.log(response);
-	// }
 
 	getData() {
 		console.log('Executing %s.getData()...', this.constructor.name);
 
-		// if (this.response != null) {
-		// 	return this.response;
-		// }
+		// If response has been already received, go on...
+		if (isObject(this.response) && this.response instanceof Response) {
+			this.responseHasBeenReceived(this.response);
+		}
 
-		// window.fetch('https://dog.ceo/api/breeds/list/all')
-		// if (this.url == null) {
-		// 	return null;
-		// }
+		// We can procede only if a valid url is defined.
+		// TODO: implement validation.
+		if (isString(this.url) && this.url === '') {
+			console.log('url is valid');
+			fetch(this.url)
+			.then(
+				this.responseHasBeenReceived
+			)
+			.catch(
+				function(error) {
+					console.log('window.fetch failed! "', error.message, '"');
+				}
+			);
+		}
 
-		fetch(this.url)
-		.then(
-			this.thenResponse
-		)
-		.catch(
-			function(error) {
-				console.log('window.fetch failed! "', error.message, '"');
-			}
-		);
 	}
 }
 

@@ -8,7 +8,7 @@
 import React, { Component } from 'react';
 import ListItem from './ListItem';
 import DataSource from './DataSource';
-import {undefinedStr, capitalize, objOwnsProp, exists, errorInfo} from './utilities';
+import { undefinedStr, typeUndef, typeStr, typeObj, capitalize, objOwnsProp, exists, errorInfo, isString, isObject, isObjectInstance } from './utilities';
 
 /**
  * This Component is responsible to present the list of breeds to the user.
@@ -21,6 +21,7 @@ class ListView extends Component {
 
 		// Prebind methods that uses this. I just don't overuse it.
 		this.responseJSONCallback = this.responseJSONCallback.bind(this);
+		this.dataSourceDelegateCallback = this.dataSourceDelegateCallback.bind(this);
 
 		this.state = {
 			json: 'undefined'
@@ -123,12 +124,12 @@ class ListView extends Component {
 
 	}
 
-	dataSourceDelegateCallback() {
+	dataSourceDelegateCallback(response) {
 		// Response.json() returns a Promise, that's why we have to use
 		// Promise.then().
 		// Read https://developer.mozilla.org/en-US/docs/Web/API/Body/json and
 		// https://developer.mozilla.org/en-US/docs/Web/API/Response#Methods
-		this.ds.response.json().then(
+		response.json().then(
 			this.responseJSONCallback
 		);
 	}

@@ -22,7 +22,41 @@ const typeObj = 'object';
  * @return {Boolean}   Return true, if the variable is a string, or false, if not.
  */
 function isString(v) {
-	return typeof v === 'string' || v instanceof String;
+	return typeof v === typeStr || v instanceof String;
+}
+
+function isObject(v) {
+	return typeof v === typeObj && v !== null;
+}
+
+function isObjectInstance(v) {
+	return typeof v === typeObj && v !== null && v instanceof Object;
+}
+
+function isArray(v) {
+	// typeof v === typeObj && v !== null && v instanceof Array;
+	return;
+}
+
+function implementsFunctionWithName(obj, funcName) {
+	return isObject(obj) && obj.hasOwnProperty(funcName);
+	// if (isObject(obj)) {
+	// 	for (var prop in obj) {
+	// 		if (prop === funcName) {
+	// 			return true;
+	// 		}
+	// 	}
+	// }
+	//
+	// return false;
+}
+
+function isValidURL(url) {
+	if (isString(url)) {
+		
+	}
+
+	return false;
 }
 
 /**
@@ -63,4 +97,4 @@ function errorInfo(e) {
   console.log('stack trace: {\n%o\n}', e.stack);
 }
 
-export {undefinedStr, capitalize, objOwnsProp, exists, errorInfo};
+export { undefinedStr, typeUndef, typeStr, typeObj, capitalize, objOwnsProp, exists, errorInfo, isString, isObject, isObjectInstance, implementsFunctionWithName, isValidURL, isArray };
