@@ -1,6 +1,8 @@
 /**
  *
- * @type {[type]}
+ * @file		src/ListItem.js
+ * @copyright	Marco Frisan 2019
+ * @author		Marco Frisan <ender.saka@gmail.com>
  */
 
 import { isString, isObject, isValidURL, implementsFunctionWithName } from './utilities';
@@ -32,6 +34,7 @@ class DataSource {
 	 */
 	setDelegate(delegate) {
 		if (implementsFunctionWithName(delegate, 'dataSourceDelegateCallback')) {
+			console.log('Set delegate...');
 			this.delegate = delegate;
 		}
 	}
@@ -73,12 +76,13 @@ class DataSource {
 
 		// If response has been already received, go on...
 		if (isObject(this.response) && this.response instanceof Response) {
+			console.log('Response has been already received previously...');
 			this.responseHasBeenReceived(this.response);
 		}
 
 		// We can procede only if a valid url is defined.
 		// TODO: implement validation.
-		if (isString(this.url) && this.url === '') {
+		if (isString(this.url) && this.url !== '') {
 			console.log('url is valid');
 			fetch(this.url)
 			.then(

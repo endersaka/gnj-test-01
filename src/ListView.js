@@ -1,7 +1,10 @@
 /**
  * Module containing the ListView Component.
  *
- * @type {Object}
+ *
+ * @file		src/ListItem.js
+ * @copyright	Marco Frisan 2019
+ * @author		Marco Frisan <ender.saka@gmail.com>
  */
 
 // Import required modules.

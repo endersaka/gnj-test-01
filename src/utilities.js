@@ -5,7 +5,7 @@
  * With this version I took the opportunity to refactor some identifiers and
  * to make it more reliable, plus some enanchements.
  *
- * @author Marco Frisan, ender.saka@gmail.com
+ * @author Marco Frisan <ender.saka@gmail.com>
  * @copyright Marco Frisan 2017-2018
  */
 
@@ -53,7 +53,7 @@ function implementsFunctionWithName(obj, funcName) {
 
 function isValidURL(url) {
 	if (isString(url)) {
-		
+
 	}
 
 	return false;
