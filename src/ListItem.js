@@ -179,7 +179,7 @@ class ListItem extends Component {
 
 	render() {
 		return (
-			<li className="dog-breeds-list-item" ref={this.breedItemRef} onMouseOver={this.handleMouseOver} onMouseOut={this.handleMouseOut}>
+			<li data-label={this.props.label} className="dog-breeds-list-item" ref={this.breedItemRef} onMouseOver={this.handleMouseOver} onMouseOut={this.handleMouseOut}>
 				<div className="dog-breeds-breed-body" ref={this.breedBodyRef}>
 					<div className="dog-breeds-breed-label" ref={this.breedLabelRef}>
 						{this.props.label}

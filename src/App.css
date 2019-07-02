@@ -36,6 +36,7 @@
   }
 }
 
+
 .dog-breeds-main {
 	display: flex;
     flex-direction: row;
@@ -43,17 +44,30 @@
     justify-content: center;
 }
 
-.dog-breeds-main ul {
-	background-color: red;
-	margin: 8px 0;
-	padding: 12px 16px;
+.dog-breeds-main div.dog-breeds-picture-container {
+	min-width: 300px;
+}
+
+.dog-breeds-main div.dog-breeds-picture-container img {
+	min-width: 300px;
+	max-width: 300px;
+	border-radius: 20px;
+}
+
+.dog-breeds-main div.dog-breeds-list-container {
 	max-height: calc(100vh - 8px * 2);
 	overflow-y: scroll;
 	box-sizing: border-box;
 	z-index: 100;
 }
 
-.dog-breeds-main ul li {
+.dog-breeds-main div.dog-breeds-list-container ul {
+	background-color: red;
+	margin: 8px 0;
+	padding: 12px 48px;
+}
+
+.dog-breeds-main div.dog-breeds-list-container ul li {
 	min-width: 200px;
 	padding: 8px;
 	text-align: left;

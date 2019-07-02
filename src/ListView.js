@@ -16,6 +16,12 @@ import { undefinedStr, typeUndef, typeStr, typeObj, capitalize, objOwnsProp, exi
 /**
  * This Component is responsible to present the list of breeds to the user.
  *
+ * @todo PictureContainer has basically the same DataSource architecture of
+ * 		 ListView. Basically everything that happens from the moment it initialize
+ * 		 the DataSource and the completion of the resource loading process is
+ * 		 the same. I think it would be better to generalize PictureContainer and
+ * 		 ListView in a super Class. (Maybe I can call it DataSourceDelegate?)
+ *
  * @extends Component
  */
 class ListView extends Component {
@@ -25,6 +31,18 @@ class ListView extends Component {
 		// Prebind methods that uses this. I just don't overuse it.
 		this.responseJSONCallback = this.responseJSONCallback.bind(this);
 		this.dataSourceDelegateCallback = this.dataSourceDelegateCallback.bind(this);
+
+		this.eventPosition = this.eventPosition.bind(this);
+		this.mouseLeave = this.mouseLeave.bind(this);
+
+		this.startScroll = this.startScroll.bind(this);
+		this.stopScroll = this.stopScroll.bind(this);
+
+		this.listContainer = React.createRef();
+
+		this.isScrolling = false;
+		this.intervalID = null;
+		this.scrollingCounter = 0;
 
 		this.state = {
 			json: 'undefined'
@@ -42,6 +60,81 @@ class ListView extends Component {
 		// Get all the breeds asyncronously and store them into window.breeds
 		// when done.
 		this.ds.getData();
+	}
+
+	startScroll(element, stepLength) {
+		if (this.isScrolling) {
+			return;
+		}
+
+		this.isScrolling = true;
+
+		this.intervalID = window.setInterval(() => {
+			element.scrollTop = element.scrollTop + stepLength;
+
+			this.scrollingCounter++;
+			console.log('this.scrollingCounter:', this.scrollingCounter);
+		}, 1000 / 60);
+	}
+
+	stopScroll() {
+		if (!this.isScrolling) {
+			return;
+		}
+
+		if (this.intervalID === null || typeof this.intervalID === typeUndef) {
+			return;
+		}
+
+		window.clearInterval(this.intervalID);
+
+		this.scrollingCounter = 0;
+		this.isScrolling = false;
+		this.intervalID = null;
+	}
+
+	mouseLeave() {
+		this.stopScroll();
+	}
+
+	eventPosition(e) {
+		let evt = e.nativeEvent;
+		let target = evt.target;
+
+		let container = target.closest('.dog-breeds-list-container');
+		// console.log('container: ', container);
+		if (container === null || container !== this.listContainer.current) {
+			// console.log('return...');
+			return;
+		}
+
+		let rect = container.getBoundingClientRect();
+
+		let x = evt.clientX - rect.left; // x position within the element.
+		let y = evt.clientY - rect.top;  // y position within the element.
+		// console.log('x: %d; y: %d', x, y);
+
+		let scrollStepLength = 5;
+		let activationDistance = 40;
+		let topActivationLimit = activationDistance;
+		let bottomActivationLimit = Math.round(rect.height) - activationDistance;
+
+		console.log('execution started');
+
+		if (y <= topActivationLimit && container.scrollTop >= scrollStepLength) {
+			console.log('start to scroll up');
+			this.startScroll(container, scrollStepLength * -1);
+		} else if (y > topActivationLimit && y < bottomActivationLimit) {
+			this.stopScroll();
+		} else if (y >= bottomActivationLimit) {
+			console.log('start to scroll down');
+			this.startScroll(container, scrollStepLength);
+		}
+
+		// TODO: this is not perfect. I think we should take in to consideration
+		// also the cases when the <ul> is fully scrolled to the top or to the
+		// bottom... Even if the browser handles it by itself... In fact the
+		// animation loop does not stop.
 	}
 
 	responseJSONCallback(json) {
@@ -132,9 +225,7 @@ class ListView extends Component {
 		// Promise.then().
 		// Read https://developer.mozilla.org/en-US/docs/Web/API/Body/json and
 		// https://developer.mozilla.org/en-US/docs/Web/API/Response#Methods
-		response.json().then(
-			this.responseJSONCallback
-		);
+		response.json().then(this.responseJSONCallback);
 	}
 
 	render() {
@@ -151,9 +242,11 @@ class ListView extends Component {
 		}
 
 		return (
-			<ul>
-				{breedItems}
-			</ul>
+			<div className="dog-breeds-list-container" onMouseMove={this.eventPosition} onMouseLeave={this.mouseLeave} ref={this.listContainer}>
+				<ul>
+					{breedItems}
+				</ul>
+			</div>
 		);
 	}
 }

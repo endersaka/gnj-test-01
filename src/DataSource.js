@@ -50,10 +50,10 @@ class DataSource {
 	}
 
 	responseHasBeenReceived(response) {
-		console.log('Response has been received succefully. Procede...');
+		console.log('Response Promise has resolved succefully.');
 
 		if (response.ok) {
-			console.log('Response appears to be ok. Procede...');
+			console.log('Response appears to be ok.');
 
 			// Store response as a member property of this object.
 			if (this.response !== response) {
@@ -61,13 +61,23 @@ class DataSource {
 			}
 			console.log('this.response:', this.response);
 
-
-			if (implementsFunctionWithName(this.delegate, 'dataSourceDelegateCallback')) {
+			if (implementsFunctionWithName(this.delegate, 'dataSourceDelegateCallback'))
+			{
 				console.log('Call delegate callback...');
 				this.delegate.dataSourceDelegateCallback(this.response);
 			}
-		} else {
-			throw new Error('Something went wrong with the response.');
+		}
+
+		// Throw an Error if response.ok === false. TODO: create a custom Error class.
+		else {
+			// Initialize a new Error instance.
+			let err = new Error('Something went wrong! Response is not ok.');
+
+			// Add a response property to it.
+			err.response = response;
+
+			// Throw the error.
+			throw err;
 		}
 	}
 
@@ -75,10 +85,10 @@ class DataSource {
 		console.log('Executing %s.getData()...', this.constructor.name);
 
 		// If response has been already received, go on...
-		if (isObject(this.response) && this.response instanceof Response) {
-			console.log('Response has been already received previously...');
-			this.responseHasBeenReceived(this.response);
-		}
+		// if (isObject(this.response) && this.response instanceof Response) {
+		// 	console.log('Response has been already received previously...');
+		// 	this.responseHasBeenReceived(this.response);
+		// }
 
 		// We can procede only if a valid url is defined.
 		// TODO: implement validation.
@@ -90,7 +100,8 @@ class DataSource {
 			)
 			.catch(
 				function(error) {
-					console.log('window.fetch failed! "', error.message, '"');
+					console.log('window.fetch failed! "%s".', error.message);
+					console.log('Response status:', error.response.status);
 				}
 			);
 		}
